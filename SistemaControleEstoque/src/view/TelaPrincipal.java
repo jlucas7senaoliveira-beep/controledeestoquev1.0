@@ -141,6 +141,33 @@ public class TelaPrincipal extends JFrame {
                 sair();
             }
         });
+        JMenu menuUsuarios = new JMenu("Usuários");
+        menuBar.add(menuUsuarios);
+
+        JMenuItem itemEditarPerfil = new JMenuItem("Editar Perfil Atual");
+        itemEditarPerfil.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                carregarPainel(new PainelEditarPerfil(usuarioLogado));
+            }
+        });
+        menuUsuarios.add(itemEditarPerfil);
+
+        JMenuItem itemNovoUsuario = new JMenuItem("Cadastrar Novo Usuário");
+        itemNovoUsuario.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                carregarPainel(new PainelNovoUsuario());
+            }
+        });
+        menuUsuarios.add(itemNovoUsuario);
+
+        JMenuItem itemListarUsuarios = new JMenuItem("Listar Usuários");
+        itemListarUsuarios.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                carregarPainel(new PainelListarUsuarios());
+            }
+        });
+        menuUsuarios.add(itemListarUsuarios);
+
         menuSistema.add(itemSair);
 
         contentPane = new JPanel();
@@ -169,7 +196,7 @@ public class TelaPrincipal extends JFrame {
         carregarPainel(new PainelDashboard());
     }
 
-    private void carregarPainel(JPanel painel) {
+    public void carregarPainel(JPanel painel) {
         painelConteudo.removeAll();
         painelConteudo.add(painel, BorderLayout.CENTER);
         painelConteudo.revalidate();

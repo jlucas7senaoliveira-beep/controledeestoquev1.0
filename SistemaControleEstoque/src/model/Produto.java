@@ -19,104 +19,110 @@ public class Produto {
     }
 
     public Produto(String nome, String descricao, BigDecimal valorCusto, BigDecimal valorVenda,
-                   int quantidadeEstoque, int estoqueMinimo, int idCategoria, int idFornecedor) {
-        this.nome = nome;
-        this.descricao = descricao;
-        this.valorCusto = valorCusto;
-        this.valorVenda = valorVenda;
-        this.quantidadeEstoque = quantidadeEstoque;
-        this.estoqueMinimo = estoqueMinimo;
-        this.idCategoria = idCategoria;
-        this.idFornecedor = idFornecedor;
-    }
+            int quantidadeEstoque, int estoqueMinimo, int idCategoria, int idFornecedor) {
+ this.nome = nome;
+ this.descricao = descricao;
+ this.valorCusto = valorCusto;
+ this.valorVenda = valorVenda;
+ this.quantidadeEstoque = quantidadeEstoque;
+ this.estoqueMinimo = estoqueMinimo;
+ this.idCategoria = idCategoria;
+ this.idFornecedor = idFornecedor;
+}
 
-    public int getIdProduto() {
-        return idProduto;
-    }
+public int getIdProduto() {
+ return idProduto;
+}
 
-    public void setIdProduto(int idProduto) {
-        this.idProduto = idProduto;
-    }
+public void setIdProduto(int idProduto) {
+ this.idProduto = idProduto;
+}
 
-    public String getNome() {
-        return nome;
-    }
+public String getNome() {
+ return nome;
+}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+public void setNome(String nome) {
+ this.nome = nome;
+}
 
 
-    public BigDecimal getValorCusto() {
-        return valorCusto;
-    }
+public String getDescricao() {
+ return descricao;
+}
 
-    public void setValorCusto(BigDecimal valorCusto) {
-        this.valorCusto = valorCusto;
-    }
+public void setDescricao(String descricao) {
+ this.descricao = descricao;
+}
 
-    public BigDecimal getValorVenda() {
-        return valorVenda;
-    }
 
-    public void setValorVenda(BigDecimal valorVenda) {
-        this.valorVenda = valorVenda;
-    }
+public BigDecimal getValorCusto() {
+ return valorCusto;
+}
 
-    public int getQuantidadeEstoque() {
-        return quantidadeEstoque;
-    }
+public void setValorCusto(BigDecimal valorCusto) {
+ this.valorCusto = valorCusto;
+}
 
-    public void setQuantidadeEstoque(int quantidadeEstoque) {
-        this.quantidadeEstoque = quantidadeEstoque;
-    }
+public BigDecimal getValorVenda() {
+ return valorVenda;
+}
 
-    public int getEstoqueMinimo() {
-        return estoqueMinimo;
-    }
+public void setValorVenda(BigDecimal valorVenda) {
+ this.valorVenda = valorVenda;
+}
 
-    public void setEstoqueMinimo(int estoqueMinimo) {
-        this.estoqueMinimo = estoqueMinimo;
-    }
+public int getQuantidadeEstoque() {
+ return quantidadeEstoque;
+}
 
-    public int getIdCategoria() {
-        return idCategoria;
-    }
+public void setQuantidadeEstoque(int quantidadeEstoque) {
+ this.quantidadeEstoque = quantidadeEstoque;
+}
 
-    public void setIdCategoria(int idCategoria) {
-        this.idCategoria = idCategoria;
-    }
+public int getEstoqueMinimo() {
+ return estoqueMinimo;
+}
 
-    public int getIdFornecedor() {
-        return idFornecedor;
-    }
+public void setEstoqueMinimo(int estoqueMinimo) {
+ this.estoqueMinimo = estoqueMinimo;
+}
 
-    public void setIdFornecedor(int idFornecedor) {
-        this.idFornecedor = idFornecedor;
-    }
+public int getIdCategoria() {
+ return idCategoria;
+}
 
-    public String getNomeCategoria() {
-        return nomeCategoria;
-    }
+public void setIdCategoria(int idCategoria) {
+ this.idCategoria = idCategoria;
+}
 
-    public void setNomeCategoria(String nomeCategoria) {
-        this.nomeCategoria = nomeCategoria;
-    }
+public int getIdFornecedor() {
+ return idFornecedor;
+}
 
-    public String getNomeFornecedor() {
-        return nomeFornecedor;
-    }
+public void setIdFornecedor(int idFornecedor) {
+ this.idFornecedor = idFornecedor;
+}
 
-    public void setNomeFornecedor(String nomeFornecedor) {
-        this.nomeFornecedor = nomeFornecedor;
-    }
+public String getNomeCategoria() {
+ return nomeCategoria;
+}
+
+public void setNomeCategoria(String nomeCategoria) {
+ this.nomeCategoria = nomeCategoria;
+}
+
+public String getNomeFornecedor() {
+ return nomeFornecedor;
+}
+
+public void setNomeFornecedor(String nomeFornecedor) {
+ this.nomeFornecedor = nomeFornecedor;
+}
+
+
+@Override
+public String toString() {
+ return nome;
+}
 }

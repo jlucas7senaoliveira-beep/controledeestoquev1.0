@@ -4,6 +4,7 @@ public class Usuario {
 	 private int idUsuario;
 	    private String nome;
 	    private String login;
+	    private String senhaHash;
 	    private String perfil;
 	    private boolean ativo;
 	    
@@ -11,10 +12,10 @@ public class Usuario {
 
 	    }
 
-	    public Usuario(int idUsuario, String nome, String login, String perfil, boolean ativo) {
-	        this.idUsuario = idUsuario;
+	    public Usuario(String nome, String login, String senhaHash, String perfil, boolean ativo) {
 	        this.nome = nome;
 	        this.login = login;
+	        this.senhaHash= senhaHash;
 	        this.perfil = perfil;
 	        this.ativo = ativo;
 	    }
@@ -44,6 +45,16 @@ public class Usuario {
 	        this.login = login;
 	    }
 
+
+	    public String getSenhaHash() {
+	        return senhaHash;
+	    }
+
+	    public void setSenhaHash(String senhaHash) {
+	        this.senhaHash= senhaHash;
+	    }
+
+
 	    public String getPerfil() {
 	        return perfil;
 	    }
@@ -51,6 +62,7 @@ public class Usuario {
 	    public void setPerfil(String perfil) {
 	        this.perfil = perfil;
 	    }
+
 
 	    public boolean isAtivo() {
 	        return ativo;
