@@ -57,3 +57,26 @@ dados e regras de negócio.
 - Professor: Eugênio
 - Ano: 2026
 - Desenvolvimento: projeto acadêmico em equipe
+
+## Demonstração do sistema
+
+Imagens ilustrativas da aplicação, incluindo telas editadas
+com dados fictícios para fins de demonstração.
+
+### Tela de login
+![Login](screenshots/login.png)
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Listagem de produtos
+![Produtos](screenshots/produtos.png)
+
+### Entrada de estoque
+![Entrada de estoque](screenshots/entrada.png)
+
+### Histórico de movimentações
+![Histórico](screenshots/historico.png)
+
+### Cadastro de usuários
+![Usuários](screenshots/usuarios.png)
