@@ -1,1 +1,19 @@
 /.metadata/
+
+# Arquivos do macOS
+.DS_Store
+
+# Configuracoes locais do Eclipse
+.metadata/
+*.launch
+
+# Arquivos compilados
+bin/
+*.class
+
+# Projetos auxiliares
+/_pasted_code_/
+
+# Credenciais locais
+.env
+.env.*

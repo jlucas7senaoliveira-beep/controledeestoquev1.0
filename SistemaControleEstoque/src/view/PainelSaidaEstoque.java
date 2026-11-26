@@ -1,10 +1,22 @@
+
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.math.BigDecimal;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,201 +31,943 @@ import dao.MovimentacaoEstoqueDAO;
 import dao.ProdutoDAO;
 import model.MovimentacaoEstoque;
 import model.Produto;
+import model.Usuario;
 
 public class PainelSaidaEstoque extends JPanel {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+
+    private static final Color COR_FUNDO =
+            new Color(237, 241, 246);
+
+    private static final Color COR_AZUL =
+            new Color(25, 57, 94);
+
+    private static final Color COR_CINZA =
+            new Color(100, 116, 139);
+
+    private static final Color COR_BORDA =
+            new Color(220, 227, 235);
+
+    private static final Color COR_CAMPO =
+            new Color(248, 250, 252);
+
+    private static final Color COR_VERMELHO =
+            new Color(183, 60, 60);
 
     private JComboBox<Produto> comboProduto;
     private JTextField txtQuantidade;
     private JTextField txtValorUnitario;
     private JTextArea txtObservacao;
+
     private JLabel lblEstoqueAtual;
+    private JPanel painelEstoqueAtual;
+
+    private final Usuario usuarioLogado;
+
+    // CONSTRUTOR ORIGINAL
 
     public PainelSaidaEstoque() {
-        setLayout(null);
 
-        JLabel lblTitulo = new JLabel("Saída de Estoque");
-        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 22));
-        lblTitulo.setBounds(230, 20, 350, 30);
-        add(lblTitulo);
+        this(null);
+    }
 
-        JLabel lblProduto = new JLabel("Produto");
-        lblProduto.setBounds(80, 90, 100, 20);
-        add(lblProduto);
+    // CONSTRUTOR COM USUÁRIO LOGADO
 
-        comboProduto = new JComboBox<Produto>();
-        comboProduto.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mostrarEstoqueAtual();
-            }
-        });
-        comboProduto.setBounds(80, 115, 420, 30);
-        add(comboProduto);
+    public PainelSaidaEstoque(Usuario usuarioLogado) {
 
-        lblEstoqueAtual = new JLabel("Estoque atual: 0");
-        lblEstoqueAtual.setBounds(520, 115, 180, 30);
-        add(lblEstoqueAtual);
+        this.usuarioLogado = usuarioLogado;
 
-        JLabel lblQuantidade = new JLabel("Quantidade");
-        lblQuantidade.setBounds(80, 165, 120, 20);
-        add(lblQuantidade);
+        setLayout(new BorderLayout());
+        setBackground(COR_FUNDO);
 
-        txtQuantidade = new JTextField();
-        txtQuantidade.setBounds(80, 190, 150, 30);
-        add(txtQuantidade);
+        JPanel conteudo = new JPanel();
 
-        JLabel lblValorUnitario = new JLabel("Valor Unitário");
-        lblValorUnitario.setBounds(260, 165, 120, 20);
-        add(lblValorUnitario);
+        conteudo.setOpaque(false);
 
-        txtValorUnitario = new JTextField();
-        txtValorUnitario.setBounds(260, 190, 150, 30);
-        add(txtValorUnitario);
+        conteudo.setLayout(
+                new BoxLayout(conteudo, BoxLayout.Y_AXIS));
 
-        JLabel lblObservacao = new JLabel("Observação");
-        lblObservacao.setBounds(80, 240, 120, 20);
-        add(lblObservacao);
+        conteudo.setBorder(
+                BorderFactory.createEmptyBorder(
+                        28, 25, 30, 25));
 
-        JScrollPane scrollObservacao = new JScrollPane();
-        scrollObservacao.setBounds(80, 265, 500, 90);
-        add(scrollObservacao);
+        conteudo.add(criarCabecalho());
+        conteudo.add(Box.createVerticalStrut(22));
 
-        txtObservacao = new JTextArea();
-        scrollObservacao.setViewportView(txtObservacao);
+        PainelArredondado formulario =
+                new PainelArredondado(Color.WHITE, 18);
 
-        JButton btnRegistrar = new JButton("Registrar Saída");
-        btnRegistrar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                registrarSaida();
-            }
-        });
-        btnRegistrar.setBounds(80, 390, 160, 35);
-        add(btnRegistrar);
+        formulario.setLayout(new BorderLayout());
 
-        JButton btnLimpar = new JButton("Limpar");
-        btnLimpar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                limparCampos();
-            }
-        });
-        btnLimpar.setBounds(260, 390, 120, 35);
-        add(btnLimpar);
+        formulario.setBorder(
+                BorderFactory.createEmptyBorder(
+                        25, 28, 25, 28));
+
+        JPanel campos = new JPanel();
+
+        campos.setOpaque(false);
+
+        campos.setLayout(
+                new BoxLayout(campos, BoxLayout.Y_AXIS));
+
+        criarCampos(campos);
+
+        formulario.add(campos, BorderLayout.CENTER);
+
+        JPanel centralizador =
+                new JPanel(new FlowLayout(
+                        FlowLayout.CENTER, 0, 0));
+
+        centralizador.setOpaque(false);
+
+        centralizador.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        centralizador.add(formulario);
+
+        conteudo.add(centralizador);
+        conteudo.add(Box.createVerticalGlue());
+
+        JScrollPane scroll =
+                new JScrollPane(conteudo);
+
+        scroll.setBorder(null);
+
+        scroll.getViewport()
+                .setBackground(COR_FUNDO);
+
+        scroll.getVerticalScrollBar()
+                .setUnitIncrement(16);
+
+        add(scroll, BorderLayout.CENTER);
 
         carregarProdutos();
     }
 
+    // CABEÇALHO
+
+    private JPanel criarCabecalho() {
+
+        JPanel painel = new JPanel();
+
+        painel.setOpaque(false);
+
+        painel.setLayout(
+                new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        painel.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        JLabel titulo =
+                new JLabel("Saída de Estoque");
+
+        titulo.setFont(
+                new Font("SansSerif", Font.BOLD, 25));
+
+        titulo.setForeground(COR_AZUL);
+
+        titulo.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        JLabel subtitulo = new JLabel(
+                "Registre a saída de produtos do estoque");
+
+        subtitulo.setFont(
+                new Font("SansSerif", Font.PLAIN, 13));
+
+        subtitulo.setForeground(COR_CINZA);
+
+        subtitulo.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        painel.add(titulo);
+        painel.add(Box.createVerticalStrut(6));
+        painel.add(subtitulo);
+
+        return painel;
+    }
+
+    // IDENTIFICAÇÃO DO RESPONSÁVEL
+
+    private JPanel criarPainelResponsavel() {
+
+        PainelArredondado painel =
+                new PainelArredondado(
+                        new Color(237, 242, 248), 12);
+
+        painel.setLayout(
+                new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        painel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        12, 15, 12, 15));
+
+        painel.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        painel.setPreferredSize(
+                new Dimension(800, 70));
+
+        painel.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, 70));
+
+        JLabel lblTitulo = new JLabel(
+                "Responsável pela movimentação");
+
+        lblTitulo.setFont(
+                new Font("SansSerif", Font.PLAIN, 12));
+
+        lblTitulo.setForeground(COR_CINZA);
+
+        lblTitulo.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        String nomeResponsavel =
+                usuarioLogado != null
+                        ? usuarioLogado.getNome()
+                        : "Usuário não identificado";
+
+        JLabel lblResponsavel =
+                new JLabel(nomeResponsavel);
+
+        lblResponsavel.setFont(
+                new Font("SansSerif", Font.BOLD, 16));
+
+        lblResponsavel.setForeground(COR_AZUL);
+
+        lblResponsavel.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        painel.add(lblTitulo);
+
+        painel.add(Box.createVerticalStrut(5));
+
+        painel.add(lblResponsavel);
+
+        return painel;
+    }
+
+    // FORMULÁRIO
+
+    private void criarCampos(JPanel painel) {
+
+        // RESPONSÁVEL PELA SAÍDA
+
+        painel.add(criarPainelResponsavel());
+
+        painel.add(Box.createVerticalStrut(22));
+
+        painel.add(criarDivisor());
+
+        painel.add(Box.createVerticalStrut(22));
+
+        // INFORMAÇÕES DA SAÍDA
+
+        painel.add(criarTituloSecao(
+                "Informações da saída"));
+
+        painel.add(Box.createVerticalStrut(18));
+
+        comboProduto = new JComboBox<>();
+
+        comboProduto.setFont(
+                new Font("SansSerif", Font.PLAIN, 13));
+
+        comboProduto.setForeground(COR_AZUL);
+        comboProduto.setBackground(COR_CAMPO);
+
+        comboProduto.setPreferredSize(
+                new Dimension(550, 38));
+
+        // INDICADOR DE ESTOQUE ATUAL
+
+        painelEstoqueAtual =
+                new JPanel(new BorderLayout());
+
+        painelEstoqueAtual.setBackground(
+                new Color(237, 242, 248));
+
+        painelEstoqueAtual.setPreferredSize(
+                new Dimension(220, 38));
+
+        painelEstoqueAtual.setBorder(
+                BorderFactory.createLineBorder(
+                        COR_BORDA));
+
+        lblEstoqueAtual =
+                new JLabel("0 unidades");
+
+        lblEstoqueAtual.setFont(
+                new Font("SansSerif", Font.BOLD, 16));
+
+        lblEstoqueAtual.setForeground(COR_AZUL);
+
+        lblEstoqueAtual.setHorizontalAlignment(
+                SwingConstants.CENTER);
+
+        painelEstoqueAtual.add(
+                lblEstoqueAtual, BorderLayout.CENTER);
+
+        comboProduto.addActionListener(
+                e -> mostrarEstoqueAtual());
+
+        JPanel linhaProduto =
+                new JPanel(new BorderLayout(20, 0));
+
+        linhaProduto.setOpaque(false);
+
+        linhaProduto.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        linhaProduto.setPreferredSize(
+                new Dimension(800, 62));
+
+        linhaProduto.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, 62));
+
+        linhaProduto.add(
+                criarGrupoCampo("Produto", comboProduto),
+                BorderLayout.CENTER);
+
+        linhaProduto.add(
+                criarGrupoCampo(
+                        "Estoque atual", painelEstoqueAtual),
+                BorderLayout.EAST);
+
+        painel.add(linhaProduto);
+
+        painel.add(Box.createVerticalStrut(18));
+
+        // QUANTIDADE E VALOR
+
+        txtQuantidade = criarCampoTexto();
+
+        txtValorUnitario = criarCampoTexto();
+
+        txtQuantidade.setToolTipText(
+                "Informe a quantidade de produtos retirados");
+
+        txtValorUnitario.setToolTipText(
+                "Informe o valor unitário do produto");
+
+        JPanel linha2 = criarLinha(
+
+                criarGrupoCampo(
+                        "Quantidade", txtQuantidade),
+
+                criarGrupoCampo(
+                        "Valor unitário (R$)",
+                        txtValorUnitario));
+
+        painel.add(linha2);
+
+        painel.add(Box.createVerticalStrut(25));
+
+        painel.add(criarDivisor());
+
+        painel.add(Box.createVerticalStrut(22));
+
+        // OBSERVAÇÕES
+
+        painel.add(criarTituloSecao(
+                "Observações da movimentação"));
+
+        painel.add(Box.createVerticalStrut(16));
+
+        JLabel lblObservacao =
+                new JLabel("Observação (opcional)");
+
+        lblObservacao.setFont(
+                new Font("SansSerif", Font.PLAIN, 12));
+
+        lblObservacao.setForeground(COR_CINZA);
+
+        txtObservacao = new JTextArea(4, 30);
+
+        txtObservacao.setLineWrap(true);
+
+        txtObservacao.setWrapStyleWord(true);
+
+        txtObservacao.setFont(
+                new Font("SansSerif", Font.PLAIN, 13));
+
+        txtObservacao.setForeground(COR_AZUL);
+
+        txtObservacao.setBackground(COR_CAMPO);
+
+        txtObservacao.setBorder(
+                BorderFactory.createEmptyBorder(
+                        10, 12, 10, 12));
+
+        txtObservacao.setToolTipText(
+                "Informe detalhes sobre a saída, se necessário");
+
+        JScrollPane scrollObservacao =
+                new JScrollPane(txtObservacao);
+
+        scrollObservacao.setBorder(
+                BorderFactory.createLineBorder(
+                        COR_BORDA));
+
+        scrollObservacao.setPreferredSize(
+                new Dimension(800, 100));
+
+        JPanel grupoObservacao =
+                new JPanel(new BorderLayout(0, 7));
+
+        grupoObservacao.setOpaque(false);
+
+        grupoObservacao.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        grupoObservacao.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, 125));
+
+        grupoObservacao.add(
+                lblObservacao, BorderLayout.NORTH);
+
+        grupoObservacao.add(
+                scrollObservacao, BorderLayout.CENTER);
+
+        painel.add(grupoObservacao);
+
+        painel.add(Box.createVerticalStrut(25));
+
+        painel.add(criarDivisor());
+
+        painel.add(Box.createVerticalStrut(22));
+
+        // BOTÕES
+
+        JPanel botoes =
+                new JPanel(new FlowLayout(
+                        FlowLayout.RIGHT, 12, 0));
+
+        botoes.setOpaque(false);
+
+        botoes.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        JButton btnLimpar =
+                criarBotao("Limpar", false);
+
+        btnLimpar.addActionListener(
+                e -> limparCampos());
+
+        JButton btnRegistrar =
+                criarBotao("Registrar saída", true);
+
+        btnRegistrar.addActionListener(
+                e -> registrarSaida());
+
+        botoes.add(btnLimpar);
+        botoes.add(btnRegistrar);
+
+        painel.add(botoes);
+    }
+
+    // TÍTULOS DAS SEÇÕES
+
+    private JLabel criarTituloSecao(String texto) {
+
+        JLabel label = new JLabel(texto);
+
+        label.setFont(
+                new Font("SansSerif", Font.BOLD, 16));
+
+        label.setForeground(COR_AZUL);
+
+        label.setHorizontalAlignment(
+                SwingConstants.CENTER);
+
+        label.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        label.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, 30));
+
+        return label;
+    }
+
+    // CAMPOS DE TEXTO
+
+    private JTextField criarCampoTexto() {
+
+        JTextField campo = new JTextField();
+
+        campo.setFont(
+                new Font("SansSerif", Font.PLAIN, 13));
+
+        campo.setForeground(COR_AZUL);
+        campo.setBackground(COR_CAMPO);
+
+        campo.setPreferredSize(
+                new Dimension(390, 38));
+
+        campo.setBorder(
+                BorderFactory.createCompoundBorder(
+
+                        BorderFactory.createLineBorder(
+                                COR_BORDA),
+
+                        BorderFactory.createEmptyBorder(
+                                5, 10, 5, 10)));
+
+        return campo;
+    }
+
+    // AGRUPAMENTO DOS CAMPOS
+
+    private JPanel criarGrupoCampo(
+            String titulo, Component campo) {
+
+        JPanel grupo =
+                new JPanel(new BorderLayout(0, 7));
+
+        grupo.setOpaque(false);
+
+        JLabel label = new JLabel(titulo);
+
+        label.setFont(
+                new Font("SansSerif", Font.PLAIN, 12));
+
+        label.setForeground(COR_CINZA);
+
+        grupo.add(label, BorderLayout.NORTH);
+
+        grupo.add(campo, BorderLayout.CENTER);
+
+        return grupo;
+    }
+
+    // ORGANIZAÇÃO DAS LINHAS
+
+    private JPanel criarLinha(JPanel... campos) {
+
+        JPanel linha = new JPanel(
+                new GridLayout(1, campos.length, 20, 0));
+
+        linha.setOpaque(false);
+
+        linha.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        linha.setPreferredSize(
+                new Dimension(800, 62));
+
+        linha.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, 62));
+
+        for (JPanel campo : campos) {
+
+            linha.add(campo);
+        }
+
+        return linha;
+    }
+
+    // DIVISÓRIAS
+
+    private JPanel criarDivisor() {
+
+        JPanel divisor = new JPanel();
+
+        divisor.setBackground(COR_BORDA);
+
+        divisor.setPreferredSize(
+                new Dimension(0, 1));
+
+        divisor.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, 1));
+
+        divisor.setAlignmentX(
+                Component.CENTER_ALIGNMENT);
+
+        return divisor;
+    }
+
+    // BOTÕES
+
+    private JButton criarBotao(
+            String texto, boolean principal) {
+
+        JButton botao = new JButton(texto);
+
+        botao.setFont(
+                new Font("SansSerif", Font.BOLD, 13));
+
+        botao.setFocusPainted(false);
+        botao.setOpaque(true);
+        botao.setContentAreaFilled(true);
+
+        botao.setCursor(
+                Cursor.getPredefinedCursor(
+                        Cursor.HAND_CURSOR));
+
+        botao.setPreferredSize(
+                new Dimension(
+                        principal ? 170 : 145, 40));
+
+        if (principal) {
+
+            botao.setBackground(COR_AZUL);
+
+            botao.setForeground(Color.WHITE);
+
+            botao.setBorder(
+                    BorderFactory.createLineBorder(
+                            COR_AZUL));
+
+        } else {
+
+            botao.setBackground(
+                    new Color(241, 245, 249));
+
+            botao.setForeground(COR_AZUL);
+
+            botao.setBorder(
+                    BorderFactory.createLineBorder(
+                            COR_BORDA));
+        }
+
+        return botao;
+    }
+
+    // CARREGAR PRODUTOS
+
     private void carregarProdutos() {
 
-        ProdutoDAO produtoDAO = new ProdutoDAO();
+        ProdutoDAO produtoDAO =
+                new ProdutoDAO();
 
         comboProduto.removeAllItems();
 
-        for (Produto produto : produtoDAO.listarParaCombo()) {
+        for (Produto produto :
+                produtoDAO.listarParaCombo()) {
+
             comboProduto.addItem(produto);
         }
 
         mostrarEstoqueAtual();
     }
 
+    // MOSTRAR ESTOQUE ATUAL
+
     private void mostrarEstoqueAtual() {
 
-        Produto produtoSelecionado = (Produto) comboProduto.getSelectedItem();
+        Produto produtoSelecionado =
+                (Produto) comboProduto.getSelectedItem();
 
         if (produtoSelecionado == null) {
-            lblEstoqueAtual.setText("Estoque atual: 0");
+
+            lblEstoqueAtual.setText("0 unidades");
+
+            lblEstoqueAtual.setForeground(COR_CINZA);
+
+            painelEstoqueAtual.setBackground(
+                    new Color(241, 245, 249));
+
+            painelEstoqueAtual.setBorder(
+                    BorderFactory.createLineBorder(
+                            COR_BORDA));
+
             return;
         }
 
-        ProdutoDAO produtoDAO = new ProdutoDAO();
-        int estoqueAtual = produtoDAO.buscarEstoqueAtual(produtoSelecionado.getIdProduto());
+        ProdutoDAO produtoDAO =
+                new ProdutoDAO();
 
-        lblEstoqueAtual.setText("Estoque atual: " + estoqueAtual);
+        int estoqueAtual =
+                produtoDAO.buscarEstoqueAtual(
+                        produtoSelecionado.getIdProduto());
+
+        lblEstoqueAtual.setText(
+                estoqueAtual +
+                (estoqueAtual == 1
+                        ? " unidade"
+                        : " unidades"));
+
+        if (estoqueAtual <= 0) {
+
+            lblEstoqueAtual.setForeground(
+                    COR_VERMELHO);
+
+            painelEstoqueAtual.setBackground(
+                    new Color(252, 239, 239));
+
+            painelEstoqueAtual.setBorder(
+                    BorderFactory.createLineBorder(
+                            new Color(235, 210, 210)));
+
+        } else {
+
+            lblEstoqueAtual.setForeground(COR_AZUL);
+
+            painelEstoqueAtual.setBackground(
+                    new Color(237, 242, 248));
+
+            painelEstoqueAtual.setBorder(
+                    BorderFactory.createLineBorder(
+                            COR_BORDA));
+        }
     }
+
+    // REGISTRAR SAÍDA
 
     private void registrarSaida() {
 
-        Produto produtoSelecionado = (Produto) comboProduto.getSelectedItem();
+        // VERIFICAR USUÁRIO RESPONSÁVEL
 
-        if (produtoSelecionado == null) {
-            JOptionPane.showMessageDialog(this, "Selecione um produto.");
+        if (usuarioLogado == null
+                || usuarioLogado.getIdUsuario() <= 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Não foi possível identificar o usuário logado.",
+                    "Usuário não identificado",
+                    JOptionPane.ERROR_MESSAGE);
+
             return;
         }
 
-        String quantidadeTexto = txtQuantidade.getText().trim();
-        String valorTexto = txtValorUnitario.getText().trim().replace(",", ".");
-        String observacao = txtObservacao.getText().trim();
+        // VERIFICAR PRODUTO
+
+        Produto produtoSelecionado =
+                (Produto) comboProduto.getSelectedItem();
+
+        if (produtoSelecionado == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Selecione um produto.",
+                    "Campo obrigatório",
+                    JOptionPane.WARNING_MESSAGE);
+
+            return;
+        }
+
+        String quantidadeTexto =
+                txtQuantidade.getText().trim();
+
+        String valorTexto =
+                txtValorUnitario.getText()
+                        .trim().replace(",", ".");
+
+        String observacao =
+                txtObservacao.getText().trim();
 
         if (quantidadeTexto.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Informe a quantidade.");
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Informe a quantidade.",
+                    "Campo obrigatório",
+                    JOptionPane.WARNING_MESSAGE);
+
             txtQuantidade.requestFocus();
+
             return;
         }
 
         if (valorTexto.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Informe o valor unitário.");
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Informe o valor unitário.",
+                    "Campo obrigatório",
+                    JOptionPane.WARNING_MESSAGE);
+
             txtValorUnitario.requestFocus();
+
+            return;
+        }
+
+        // LIMITE DE CARACTERES DA OBSERVAÇÃO
+
+        if (observacao.length() > 255) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "A observação deve ter no máximo 255 caracteres.",
+                    "Observação muito longa",
+                    JOptionPane.WARNING_MESSAGE);
+
+            txtObservacao.requestFocus();
+
             return;
         }
 
         try {
-            int quantidade = Integer.parseInt(quantidadeTexto);
-            BigDecimal valorUnitario = new BigDecimal(valorTexto);
+
+            int quantidade =
+                    Integer.parseInt(quantidadeTexto);
+
+            BigDecimal valorUnitario =
+                    new BigDecimal(valorTexto);
 
             if (quantidade <= 0) {
-                JOptionPane.showMessageDialog(this, "A quantidade deve ser maior que zero.");
-                txtQuantidade.requestFocus();
-                return;
-            }
 
-            int estoqueAtual = new ProdutoDAO().buscarEstoqueAtual(produtoSelecionado.getIdProduto());
-
-            if (quantidade > estoqueAtual) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Quantidade insuficiente em estoque.\nEstoque atual: " + estoqueAtual,
-                        "Estoque insuficiente",
-                        JOptionPane.WARNING_MESSAGE
-                );
+                        "A quantidade deve ser maior que zero.",
+                        "Quantidade inválida",
+                        JOptionPane.WARNING_MESSAGE);
+
                 txtQuantidade.requestFocus();
+
                 return;
             }
 
-            MovimentacaoEstoque movimentacao = new MovimentacaoEstoque(
-                    produtoSelecionado.getIdProduto(),
-                    "SAIDA",
-                    quantidade,
-                    valorUnitario,
-                    observacao
-            );
+            if (valorUnitario.compareTo(
+                    BigDecimal.ZERO) < 0) {
 
-            MovimentacaoEstoqueDAO dao = new MovimentacaoEstoqueDAO();
-            boolean registrado = dao.registrarSaida(movimentacao);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "O valor unitário não pode ser negativo.",
+                        "Valor inválido",
+                        JOptionPane.WARNING_MESSAGE);
+
+                txtValorUnitario.requestFocus();
+
+                return;
+            }
+
+            // CONSULTAR ESTOQUE DISPONÍVEL
+
+            int estoqueAtual =
+                    new ProdutoDAO().buscarEstoqueAtual(
+                            produtoSelecionado.getIdProduto());
+
+            if (quantidade > estoqueAtual) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Quantidade insuficiente em estoque.\n"
+                        + "Estoque atual: " + estoqueAtual,
+                        "Estoque insuficiente",
+                        JOptionPane.WARNING_MESSAGE);
+
+                mostrarEstoqueAtual();
+
+                txtQuantidade.requestFocus();
+
+                return;
+            }
+
+            // CRIAR MOVIMENTAÇÃO COM O RESPONSÁVEL
+
+            MovimentacaoEstoque movimentacao =
+                    new MovimentacaoEstoque(
+
+                            produtoSelecionado.getIdProduto(),
+
+                            "SAIDA",
+
+                            quantidade,
+
+                            valorUnitario,
+
+                            observacao,
+
+                            usuarioLogado.getIdUsuario()
+                    );
+
+            MovimentacaoEstoqueDAO dao =
+                    new MovimentacaoEstoqueDAO();
+
+            boolean registrado =
+                    dao.registrarSaida(movimentacao);
 
             if (registrado) {
-                JOptionPane.showMessageDialog(this, "Saída registrada com sucesso.");
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Saída registrada com sucesso.",
+                        "Saída realizada",
+                        JOptionPane.INFORMATION_MESSAGE);
+
                 limparCampos();
-                mostrarEstoqueAtual();
+
             } else {
-                JOptionPane.showMessageDialog(this, "Não foi possível registrar a saída.");
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Não foi possível registrar a saída.",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+
+                mostrarEstoqueAtual();
             }
 
         } catch (NumberFormatException erro) {
-            JOptionPane.showMessageDialog(this, "Digite quantidade e valor válidos.");
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Digite quantidade e valor válidos.",
+                    "Valores inválidos",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 
+    // LIMPAR CAMPOS
+
     private void limparCampos() {
+
         txtQuantidade.setText("");
         txtValorUnitario.setText("");
         txtObservacao.setText("");
 
         if (comboProduto.getItemCount() > 0) {
+
             comboProduto.setSelectedIndex(0);
         }
 
         mostrarEstoqueAtual();
+
         txtQuantidade.requestFocus();
+    }
+
+    // PAINEL COM CANTOS ARREDONDADOS
+
+    private static class PainelArredondado
+            extends JPanel {
+
+        private static final long serialVersionUID = 1L;
+
+        private final Color corFundo;
+        private final int raio;
+
+        public PainelArredondado(
+                Color corFundo, int raio) {
+
+            this.corFundo = corFundo;
+            this.raio = raio;
+
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+
+            Graphics2D g2 =
+                    (Graphics2D) g.create();
+
+            g2.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(corFundo);
+
+            g2.fillRoundRect(
+                    0, 0,
+                    getWidth() - 1,
+                    getHeight() - 1,
+                    raio, raio);
+
+            g2.dispose();
+
+            super.paintComponent(g);
+        }
     }
 }
